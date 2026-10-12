@@ -1,0 +1,37 @@
+name: 🐍 Atualizar cobrinha das contribuições
+
+on:
+  schedule:
+    # Executa diariamente (UTC). O GitHub pode atrasar execuções agendadas.
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/snake.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  snake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Gerar animações SVG em temas claro e escuro
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/github-contribution-grid-snake.svg?color_snake=#F97316&color_dots=#FFFFFF,#DBEAFE,#93C5FD,#FDBA74,#F97316
+            dist/github-contribution-grid-snake-dark.svg?palette=github-dark&color_snake=#FB923C&color_dots=#0D1117,#172554,#1E40AF,#C2410C,#FB923C
+
+      - name: Publicar SVGs na branch output
+        uses: crazy-max/ghaction-github-pages@v5
+        with:
+          target_branch: output
+          build_dir: dist
+          jekyll: false
+          commit_message: "chore: atualizar cobrinha de contribuições [skip ci]"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
